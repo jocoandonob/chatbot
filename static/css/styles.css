@@ -1,0 +1,231 @@
+/* Main theme colors */
+:root {
+    --joco-primary: var(--bs-primary);
+    --joco-secondary: var(--bs-secondary);
+    --joco-accent: var(--bs-info);
+}
+
+/* Robot icon animations */
+.robot-icon {
+    transition: transform 0.3s ease;
+}
+
+header:hover .robot-icon {
+    transform: rotate(10deg);
+    color: var(--joco-accent);
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+}
+
+/* Input focus effects */
+.form-control:focus, .btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.4);
+    animation: pulse-light 1s;
+}
+
+@keyframes pulse-light {
+    0% { box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(var(--bs-primary-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0); }
+}
+
+/* Enhanced message styling */
+.message {
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.message:hover {
+    transform: translateX(3px);
+}
+
+.bot-message .message-content {
+    border-left: 3px solid var(--joco-primary);
+}
+
+.user-message .message-content {
+    border-right: 3px solid var(--joco-secondary);
+}
+
+/* Floating effect for the bot avatar */
+.bot-avatar {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Button hover effects */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+
+.btn-primary:active:after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+}
+
+/* Tab animation */
+.nav-tabs .nav-link {
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+}
+
+/* List item hover effects */
+.list-group-item {
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    transform: translateX(3px);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-left: 3px solid var(--bs-primary);
+}
+
+/* Request limit counter animations */
+.request-limit-low {
+    animation: pulse-warning 2s infinite;
+    color: var(--bs-warning) !important;
+}
+
+.request-limit-critical {
+    animation: pulse-danger 1.5s infinite;
+    color: var(--bs-danger) !important;
+}
+
+@keyframes pulse-warning {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes pulse-danger {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Limit reached overlay */
+.limit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 0.5rem;
+    animation: fadeIn 0.5s ease-out;
+    z-index: 10;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+@keyframes fadeOut {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.limit-icon {
+    font-size: 4rem;
+    color: var(--bs-danger);
+    margin-bottom: 1rem;
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Styling for disabled panels */
+.disabled-panel {
+    pointer-events: none;
+    opacity: 0.6;
+    position: relative;
+}
+
+.disabled-panel::after {
+    content: "Limit reached";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(33, 37, 41, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+/* Loading animations */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.typing-indicator span {
+    height: 10px;
+    width: 10px;
+    float: left;
+    margin: 0 1px;
+    background-color: var(--bs-primary);
+    display: block;
+    border-radius: 50%;
+    opacity: 0.4;
+}
+
+.typing-indicator span:nth-of-type(1) {
+    animation: typing 1s infinite 0.2s;
+}
+.typing-indicator span:nth-of-type(2) {
+    animation: typing 1s infinite 0.4s;
+}
+.typing-indicator span:nth-of-type(3) {
+    animation: typing 1s infinite 0.6s;
+}
+
+@keyframes typing {
+    0% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.4; transform: scale(1); }
+}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joco - Document Q&A Chatbot</title>
+    <!-- Bootstrap CSS and Icons -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .robot-icon {
+            font-size: 2.5rem;
+            color: var(--bs-primary);
+        }
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .bot-avatar {
+            background-color: rgba(var(--bs-primary-rgb), 0.2);
+            color: var(--bs-primary);
+        }
+        .user-avatar {
+            background-color: rgba(var(--bs-secondary-rgb), 0.2);
+            color: var(--bs-secondary);
+        }
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        .message-content {
+            flex-grow: 1;
+            border-radius: 0.5rem;
+            padding: 10px 15px;
+        }
+        .bot-message .message-content {
+            background-color: rgba(var(--bs-primary-rgb), 0.1);
+        }
+        .user-message .message-content {
+            background-color: rgba(var(--bs-secondary-rgb), 0.1);
+        }
+        .progress-container {
+            display: none;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--bs-secondary);
+            border-top: 1px solid rgba(var(--bs-secondary-rgb), 0.2);
+        }
+        /* Animations */
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .message {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .shake-animation {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <header class="text-center mb-5">
+            <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="bi bi-robot robot-icon me-2"></i>
+                <h1>Joco</h1>
+            </div>
+            <p class="lead">Your Document Q&A Assistant</p>
+            <p class="text-muted">Upload text or PDF documents and ask questions about their content</p>
+        </header>
+
+        <div class="row g-4">
+            <!-- Upload Section -->
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary bg-opacity-10">
+                        <h2 class="h5 mb-0">Upload Document</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-3" id="inputTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-input" type="button" role="tab" aria-controls="file-input" aria-selected="true">Upload File</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-input" type="button" role="tab" aria-controls="url-input" aria-selected="false">Enter URL</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="inputTabsContent">
+                            <!-- File Upload Tab -->
+                            <div class="tab-pane fade show active" id="file-input" role="tabpanel" aria-labelledby="file-tab">
+                                <form id="upload-form">
+                                    <div class="mb-3">
+                                        <label for="document" class="form-label">Select a text or PDF file</label>
+                                        <input class="form-control" type="file" id="document" accept=".txt,.pdf">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="upload-btn">
+                                        <span id="upload-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        Upload Document
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- URL Input Tab -->
+                            <div class="tab-pane fade" id="url-input" role="tabpanel" aria-labelledby="url-tab">
+                                <form id="url-form">
+                                    <div class="mb-3">
+                                        <label for="website-url" class="form-label">Enter a website URL</label>
+                                        <input type="url" class="form-control" id="website-url" placeholder="https://example.com">
+                                        <div class="form-text">Joco will extract and process the content from this website.</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="url-btn">
+                                        <span id="url-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        Process URL
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress bar (shared between file and url) -->
+                        <div id="progress-container" class="progress-container">
+                            <label class="form-label" id="progress-label">Processing...</label>
+                            <div class="progress" role="progressbar">
+                                <div id="upload-progress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div id="upload-status" class="alert mt-3 d-none"></div>
+                        
+                        <!-- Sample Questions Section (initially hidden) -->
+                        <div id="sample-questions" class="mt-4 d-none">
+                            <h3 class="h6">Sample Questions:</h3>
+                            <ul id="questions-list" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary bg-opacity-10 d-flex align-items-center">
+                        <i class="bi bi-robot me-2"></i>
+                        <h2 class="h5 mb-0">Chat with Joco</h2>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div id="chat-container" class="flex-grow-1 mb-3 overflow-auto p-3 border rounded">
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-robot display-1"></i>
+                                <p>Upload a document and start asking Joco questions</p>
+                            </div>
+                        </div>
+                        <!-- Request limit counter -->
+                        <div id="request-limit-container" class="mb-2 text-end d-none">
+                            <small class="text-muted">
+                                Questions remaining: <span id="request-limit-counter" class="fw-bold">5</span>
+                                <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-title="You are limited to 5 questions per day"></i>
+                            </small>
+                        </div>
+                        
+                        <form id="question-form" class="mt-auto">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="question-input" placeholder="Ask Joco a question about the document..." disabled>
+                                <button type="submit" class="btn btn-primary" id="ask-btn" disabled>
+                                    <span id="ask-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                    Ask
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with visitor count -->
+        <footer class="footer">
+            <p class="mb-0">Total site visitors: <span id="visitor-count">{{ visitor_count }}</span></p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
