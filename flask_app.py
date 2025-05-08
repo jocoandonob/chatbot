@@ -52,6 +52,7 @@ def get_visitor_count():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     logger.info("Received upload request")
+    temp_file = None
     
     if 'file' not in request.files:
         return jsonify({"status": "error", "detail": "No file part"}), 400
@@ -63,43 +64,42 @@ def upload_file():
     
     # Check file type
     if file and (file.filename.endswith('.txt') or file.filename.endswith('.pdf')):
-        # Create a temporary file to store the uploaded content
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            try:
-                # Write the file content to the temp file
-                file.save(temp_file.name)
-                temp_file.flush()
-                
-                # Process the document and store embeddings
-                chunks = process_document(temp_file.name, secure_filename(file.filename))
-                vector_store.add_documents(chunks)
-                
-                # Generate sample questions based on the actual content
-                # First, let's get a summary of the document to generate better questions
-                from utils.openai_utils import get_answer_from_chunks
-                
-                # Create content-specific questions based on document content
-                content_summary = get_answer_from_chunks(
-                    "Briefly summarize the key topics and concepts in this document", 
-                    chunks[:3]  # Using first few chunks to get the main topics
-                )
-                
-                # Now generate relevant questions based on the content
-                from utils.openai_utils import generate_content_specific_questions
-                sample_questions = generate_content_specific_questions(content_summary)
-                
-                return jsonify({
-                    "status": "success", 
-                    "message": f"Successfully processed {file.filename}", 
-                    "chunks_count": len(chunks),
-                    "sample_questions": sample_questions
-                })
-            except Exception as e:
-                logger.error(f"Error processing file: {str(e)}")
-                return jsonify({"status": "error", "detail": f"Error processing file: {str(e)}"}), 500
-            finally:
-                # Remove the temporary file
-                os.unlink(temp_file.name)
+        try:
+            # Create a temporary file to store the uploaded content
+            temp_file = tempfile.NamedTemporaryFile(delete=False)
+            file.save(temp_file.name)
+            temp_file.close()  # Close the file before processing
+            
+            # Process the document and store embeddings
+            chunks = process_document(temp_file.name, secure_filename(file.filename))
+            vector_store.add_documents(chunks)
+            
+            # Generate sample questions based on the actual content
+            content_summary = get_answer_from_chunks(
+                "Briefly summarize the key topics and concepts in this document", 
+                chunks[:3]  # Using first few chunks to get the main topics
+            )
+            
+            # Generate relevant questions based on the content
+            from utils.openai_utils import generate_content_specific_questions
+            sample_questions = generate_content_specific_questions(content_summary)
+            
+            return jsonify({
+                "status": "success", 
+                "message": f"Successfully processed {file.filename}", 
+                "chunks_count": len(chunks),
+                "sample_questions": sample_questions
+            })
+        except Exception as e:
+            logger.error(f"Error processing file: {str(e)}")
+            return jsonify({"status": "error", "detail": f"Error processing file: {str(e)}"}), 500
+        finally:
+            # Clean up the temporary file
+            if temp_file and os.path.exists(temp_file.name):
+                try:
+                    os.unlink(temp_file.name)
+                except Exception as e:
+                    logger.warning(f"Could not delete temporary file: {str(e)}")
     else:
         return jsonify({"status": "error", "detail": "Only .txt and .pdf files are supported"}), 400
 
