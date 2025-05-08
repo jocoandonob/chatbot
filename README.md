@@ -1,5 +1,7 @@
 # Educational AI Chatbot
 
+![Chatbot Thumbnail](thumb.png)
+
 An innovative AI-powered educational chatbot that provides accurate, curriculum-aligned responses based on 6th-grade textbook content. Built with Flask and OpenAI, this tool ensures students receive reliable answers strictly from authorized educational materials.
 
 ## Features
