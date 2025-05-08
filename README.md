@@ -1,29 +1,28 @@
 # Educational AI Chatbot
 
-An innovative AI-powered educational chatbot that provides accurate, curriculum-aligned responses based on 6th-grade textbook content. Built with Next.js, OpenAI, and Supabase Vector database, this tool ensures students receive reliable answers strictly from authorized educational materials.
+An innovative AI-powered educational chatbot that provides accurate, curriculum-aligned responses based on 6th-grade textbook content. Built with Flask and OpenAI, this tool ensures students receive reliable answers strictly from authorized educational materials.
 
 ## Features
 
 - **Curriculum-Aligned Responses**: All answers are sourced exclusively from 6th-grade textbooks
-- **Vector Database Integration**: Efficient semantic search using Supabase Vector
+- **Vector Database Integration**: Efficient semantic search using FAISS
 - **AI-Powered Q&A**: Advanced language model integration with OpenAI
-- **Modern Web Interface**: Built with Next.js for optimal user experience
+- **Document Processing**: Support for PDF and TXT files
 - **Content Verification**: Ensures responses are strictly based on authorized educational content
-- **Scalable Architecture**: Designed for handling multiple concurrent users
+- **Rate Limiting**: Prevents abuse with request limits
 
 ## Tech Stack
 
-- **Frontend**: Next.js
+- **Backend**: Flask
 - **AI Integration**: OpenAI API
-- **Vector Database**: Supabase Vector
-- **Authentication**: Supabase Auth
-- **Deployment**: Vercel (recommended)
+- **Vector Database**: FAISS
+- **Database**: SQLite
+- **Document Processing**: PyPDF2
 
 ## Prerequisites
 
-- Node.js 18.x or higher
+- Python 3.11 or higher
 - OpenAI API key
-- Supabase account and project
 - 6th-grade textbook content (PDF format)
 
 ## Installation
@@ -36,56 +35,55 @@ cd <repository-name>
 
 2. Install dependencies:
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
 3. Set up environment variables:
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
 Required environment variables:
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-OPENAI_API_KEY=your-openai-api-key
-```
-
-4. Initialize the vector database:
-```bash
-npm run init-db
+FLASK_APP=flask_app.py
+FLASK_ENV=development
+FLASK_DEBUG=1
+SESSION_SECRET=your-secret-key-here
+SQLALCHEMY_DATABASE_URI=sqlite:///app.db
+OPENAI_API_KEY=your-openai-api-key-here
 ```
 
 ## Usage
 
-1. Start the development server:
+1. Start the Flask application:
 ```bash
-npm run dev
+python flask_app.py
 ```
 
-2. Access the application at `http://localhost:3000`
+2. Access the application at `http://localhost:5000`
 
-## Vector Database Setup
+## API Endpoints
 
-1. Process textbook content:
-```bash
-npm run process-content
-```
-
-2. Generate embeddings:
-```bash
-npm run generate-embeddings
-```
+- `GET /`: Main application page
+- `POST /upload`: Upload a document (PDF or TXT)
+- `POST /ask`: Ask a question about the content
+- `POST /process-url`: Process content from a URL
+- `GET /remaining-requests`: Check remaining question quota
+- `GET /health`: Health check endpoint
 
 ## Project Structure
 
 ```
-├── app/                 # Next.js app directory
-├── components/         # React components
-├── lib/               # Utility functions
-├── public/            # Static assets
-├── styles/            # CSS styles
-└── vector-db/         # Vector database scripts
+├── flask_app.py          # Main Flask application
+├── models.py            # Database models
+├── utils/              # Utility functions
+│   ├── document_processor.py
+│   ├── vector_store.py
+│   ├── openai_utils.py
+│   └── request_limiter.py
+├── templates/          # HTML templates
+├── static/            # Static assets
+└── requirements.txt   # Project dependencies
 ```
 
 ## Contributing
@@ -105,5 +103,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - OpenAI for providing the language model capabilities
-- Supabase for vector database infrastructure
-- Next.js team for the amazing framework 
+- Flask team for the amazing framework 
